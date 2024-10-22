@@ -7,4 +7,5 @@ using System.Threading.Tasks;
 namespace PokemonApplication;
 internal class DependencyInjection
 {
+    // encapsulate the logic for registering services for this layer
 }

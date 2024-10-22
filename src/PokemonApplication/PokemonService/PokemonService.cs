@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace PokemonApplication.PokemonService;
-internal class PokemonService
+public class PokemonService
 {
+    // implement services for PokemonController
+
 }

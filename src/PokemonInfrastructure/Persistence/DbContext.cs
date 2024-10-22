@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PokemonDomain.PokemonModel;
-public class Pokemon
+namespace PokemonInfrastructure.Persistence;
+internal class DbContext
 {
-    // existing pokemons
 }
