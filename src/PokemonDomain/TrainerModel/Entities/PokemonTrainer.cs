@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace PokemonDomain.TrainerModel.Entities;
-internal class PokemonTrainer
+public class PokemonTrainer
 {
     // all pokemons captured by a trainer
+    
 }

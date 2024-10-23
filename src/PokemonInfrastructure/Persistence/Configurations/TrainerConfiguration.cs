@@ -1,13 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PokemonDomain.TrainerModel;
 
 namespace PokemonInfrastructure.Persistence.Configurations;
-internal class TrainerConfiguration
+internal class TrainerConfiguration : IEntityTypeConfiguration<Trainer>
 {
-    // code-first configuration for the Trainer aggregate
+    public void Configure(EntityTypeBuilder<Trainer> builder)
+    {
+        builder.HasKey(t => t.CPF);
 
-    // code-first configuration for the TrainerPokemon entity
+        builder.Property(t => t.Name)
+            .IsRequired()
+            .HasMaxLength(100);
+
+        builder.Property(t => t.Age)
+            .IsRequired();
+
+        builder.Property(t => t.CPF)
+            .IsRequired()
+            .HasMaxLength(11);
+
+        builder.HasMany(t => t.Pokemons)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Restrict);
+    }
 }
