@@ -3,8 +3,9 @@
 namespace PokemonDomain.TypeModel;
 public class Type
 {
-    public string Name { get; set; }
-    public List<Pokemon> Pokemons { get; set; } = [];
+    public int Id { get; private set; }
+    public string Name { get; private set; }
+    public List<Pokemon> Pokemons { get; private set; } = [];
 
     private Type(string name)
     {
