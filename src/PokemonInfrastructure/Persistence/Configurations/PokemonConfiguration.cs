@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PokemonDomain.PokemonModel;
+using PokemonDomain.TrainerModel.Entities;
 
 namespace PokemonInfrastructure.Persistence.Configurations;
 public class PokemonConfiguration : IEntityTypeConfiguration<Pokemon>
@@ -26,11 +27,11 @@ public class PokemonConfiguration : IEntityTypeConfiguration<Pokemon>
             .WithMany(t => t.Pokemons);
 
         builder.HasMany(p => p.Evolutions)
-            .WithOne()
-            .HasForeignKey(e => e.PreviousEvolutionId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .WithMany(p => p.Involutions)
+            .UsingEntity<PokemonEvolution>()
+            ;
 
-        builder.Navigation(p => p.Types).AutoInclude();
-        builder.Navigation(p => p.Evolutions).AutoInclude();
+        //builder.Navigation(p => p.Types).AutoInclude();
+        //builder.Navigation(p => p.Evolutions).AutoInclude();
     }
 }
