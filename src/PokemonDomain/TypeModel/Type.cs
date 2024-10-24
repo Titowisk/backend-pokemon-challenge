@@ -16,4 +16,9 @@ public class Type
     {
         return new Type(name);
     }
+
+    public Type()
+    {
+        
+    }
 }

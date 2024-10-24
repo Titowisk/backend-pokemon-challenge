@@ -27,4 +27,9 @@ public class Pokemon
     {
         return new Pokemon(name, weight, height, base64Sprite);
     }
+
+    public Pokemon()
+    {
+        
+    }
 }

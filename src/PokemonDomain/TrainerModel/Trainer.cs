@@ -29,4 +29,8 @@ public class Trainer
     {
         Pokemons.Remove(pokemon);
     }
+
+    public Trainer()
+    {
+    }
 }
