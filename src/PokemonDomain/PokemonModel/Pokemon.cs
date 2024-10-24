@@ -3,9 +3,9 @@
 namespace PokemonDomain.PokemonModel;
 public class Pokemon
 {
-    public IReadOnlyList<_Type> Types { get; private set; } = [];
-    public IReadOnlyList<Pokemon> Evolutions { get; private set; } = [];
-    public IReadOnlyList<Pokemon> Involutions { get; private set; } = [];
+    public List<_Type> Types { get; private set; } = [];
+    public List<Pokemon> Evolutions { get; private set; } = [];
+    public List<Pokemon> Involutions { get; private set; } = [];
 
     public int Id { get; private set; }
     public string Name { get; private set; }
