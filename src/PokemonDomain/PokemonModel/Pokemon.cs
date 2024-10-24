@@ -1,6 +1,4 @@
-﻿using PokemonDomain.TrainerModel.Entities;
-using System.Collections.Generic;
-using _Type = PokemonDomain.TypeModel.Type;
+﻿using _Type = PokemonDomain.TypeModel.Type;
 
 namespace PokemonDomain.PokemonModel;
 public class Pokemon
@@ -30,6 +28,6 @@ public class Pokemon
 
     public Pokemon()
     {
-        
+
     }
 }
