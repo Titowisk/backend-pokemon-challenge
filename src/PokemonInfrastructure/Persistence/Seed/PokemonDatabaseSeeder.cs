@@ -18,13 +18,27 @@ namespace PokemonInfrastructure.Persistence.Seed
         public async Task SeedTable()
         {
             _context.Database.EnsureCreated();
-            await SeedPokemonTableAsync();
             await SeedTypeTableAsync();
+            await SeedPokemonTableAsync();
+            await SeedPokemonEvolutionTableAsync();
+        }
+
+        public async Task SeedTypeTableAsync()
+        {
+            var response = await _httpClient.GetStringAsync("https://pokeapi.co/api/v2/type");
+            var typeList = JsonSerializer.Deserialize<TypeListReference>(response);
+
+            // Code to seed the Type table using typeList
         }
 
         public async Task SeedPokemonTableAsync()
         {
-            int howManyPokemons = 10;
+            if(_context.Pokemons.Any())
+            {
+                return;
+            }
+
+            int howManyPokemons = 9;
             for (int pokeIndex = 1; pokeIndex <= howManyPokemons; pokeIndex++)
             {
                 Task.Delay(200).Wait(); // Delay to avoid rate limiting
@@ -37,26 +51,83 @@ namespace PokemonInfrastructure.Persistence.Seed
                     var pokemon = Pokemon.Create(
                         pokemonReference.Name,
                         pokemonReference.Weight / 10.0f, // Convert to kg
-                        pokemonReference.Height / 10.0f, // Convert to meters
+                        pokemonReference.Height * 10.0f, // Convert to cm
                         pokemonReference.Sprites.FrontDefault
                     );
 
-                    // Code to save the pokemon to the database
-                    // Example: _dbContext.Pokemons.Add(pokemon);
-                    // await _dbContext.SaveChangesAsync();
                     _context.Pokemons.Add(pokemon);
+                   
                     await _context.SaveChangesAsync();
-                    // add evolutions
                 }
             }
         }
 
-        public async Task SeedTypeTableAsync()
+        /// <summary>
+        /// https://stackoverflow.com/questions/69783976/how-to-fetch-the-data-of-evolution-chain-from-the-pokeapi
+        /// </summary>
+        /// <returns></returns>
+        public async Task SeedPokemonEvolutionTableAsync()
         {
-            var response = await _httpClient.GetStringAsync("https://pokeapi.co/api/v2/type");
-            var typeList = JsonSerializer.Deserialize<TypeListReference>(response);
+            List<Pokemon> allPokemons = _context.Pokemons.ToList();
 
-            // Code to seed the Type table using typeList
+            foreach (var pokemon in allPokemons)
+            {
+                Task.Delay(200).Wait(); // Delay to avoid rate limiting
+
+                var pokemonResponse = await _httpClient.GetStringAsync($"https://pokeapi.co/api/v2/pokemon/{pokemon.Id}");
+                PokemonReference? pokemonReference = JsonSerializer.Deserialize<PokemonReference>(pokemonResponse);
+
+                var speciesResponse = await _httpClient.GetStringAsync(pokemonReference.Species.Url);
+                SpeciesPrincipal? speciesPrincipal = JsonSerializer.Deserialize<SpeciesPrincipal>(speciesResponse);
+
+                var evolutionChain = await _httpClient.GetStringAsync(speciesPrincipal.EvolutionChain.Url);
+                EvolutionChainPrincipal? evolutionChainPrincipal = JsonSerializer.Deserialize<EvolutionChainPrincipal>(evolutionChain);
+
+                if (evolutionChainPrincipal is not null && evolutionChainPrincipal.Chain.EvolvesTo.Count != 0) 
+                {
+                    Species? nextEvolutionSpecies = GetNextEvolution(evolutionChainPrincipal.Chain, pokemonReference.Species.Url);
+                    if (nextEvolutionSpecies is null)
+                    {
+                        continue; // Pokemon has no evolution
+                    }
+
+                    Pokemon? evolution = allPokemons
+                        .FirstOrDefault(p => p.Name == nextEvolutionSpecies.Name);
+
+                    if(evolution is null)
+                    {
+                        continue; // Pokemon not found in database
+                    }
+
+                    pokemon.Evolutions.Add(evolution);
+                    evolution.Involutions.Add(pokemon);
+
+                    await _context.SaveChangesAsync();
+                }
+            }
+        }
+
+        private static Species? GetNextEvolution(Chain chain, string speciesUrl)
+        {
+            if (chain.Species.Url == speciesUrl)
+            {
+                if (chain.EvolvesTo.Count > 0)
+                {
+                    return chain.EvolvesTo[0].Species;
+                }
+                return null;
+            }
+
+            foreach (var evolvesTo in chain.EvolvesTo)
+            {
+                var result = GetNextEvolution(evolvesTo, speciesUrl);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
         }
     }
 
@@ -83,6 +154,10 @@ namespace PokemonInfrastructure.Persistence.Seed
 
         [JsonPropertyName("weight")]
         public int Weight { get; set; }
+
+        [JsonPropertyName("species")]
+        public Species Species { get; set; }
+
     }
 
     public class Sprites
@@ -129,6 +204,14 @@ namespace PokemonInfrastructure.Persistence.Seed
         [JsonPropertyName("url")]
         public string Url { get; set; }
     }
+
+    public class Species
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+        [JsonPropertyName("url")]
+        public string Url { get; set; }
+    }
     #endregion
 
     #region Pokemon Type
@@ -142,5 +225,43 @@ namespace PokemonInfrastructure.Persistence.Seed
         public string Name { get; set; }
         public string Url { get; set; }
     }
+    #endregion
+
+    #region Pokemon Species Reference
+    public class EvolutionChain
+    {
+        [JsonPropertyName("url")]
+        public string Url { get; set; }
+    }
+
+    public class SpeciesPrincipal
+    {
+        [JsonPropertyName("evolution_chain")]
+        public EvolutionChain EvolutionChain { get; set; }
+    }
+    #endregion
+
+    #region Evolution Reference
+    public class EvolutionChainPrincipal
+    {
+        [JsonPropertyName("chain")]
+        public Chain Chain { get; set; }
+
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+    }
+
+    public class Chain
+    {
+        [JsonPropertyName("evolves_to")]
+        public List<Chain> EvolvesTo { get; set; }
+
+        [JsonPropertyName("is_baby")]
+        public bool IsBaby { get; set; }
+
+        [JsonPropertyName("species")]
+        public Species Species { get; set; }
+    }
+
     #endregion
 }
