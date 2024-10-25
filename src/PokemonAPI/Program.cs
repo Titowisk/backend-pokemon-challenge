@@ -1,3 +1,4 @@
+using PokemonApplication;
 using PokemonContracts.Options;
 using PokemonInfrastructure;
 using PokemonInfrastructure.Persistence.Seed;
@@ -16,7 +17,9 @@ builder.Services.Configure<DatabaseSettings>(
 
 builder.Services.AddHttpClient();
 
-builder.Services.AddInfrastructure();
+builder.Services
+    .AddApplication()
+    .AddInfrastructure();
 
 var app = builder.Build();
 

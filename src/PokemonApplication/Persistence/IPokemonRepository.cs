@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PokemonDomain.PokemonModel;
 
 namespace PokemonApplication.Persistence;
-internal class IPokemonRepository
+public interface IPokemonRepository
 {
+    Task<List<Pokemon>> GetAll();
 }

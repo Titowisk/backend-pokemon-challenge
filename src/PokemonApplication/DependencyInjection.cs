@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.DependencyInjection;
+using PokemonApplication.PokemonService;
 
 namespace PokemonApplication;
-internal class DependencyInjection
+public static class DependencyInjection
 {
     // encapsulate the logic for registering services for this layer
+    public static IServiceCollection AddApplication(this IServiceCollection services)
+    {
+        services.AddScoped<IPokemonService, PokemonService.PokemonService>();
+        return services;
+    }
 }
