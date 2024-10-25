@@ -1,13 +1,17 @@
 ﻿using PokemonApplication.Persistence;
+using PokemonDomain.PokemonModel;
+using PokemonDomain.TrainerModel;
 
 namespace PokemonApplication.TrainerService;
 public class TrainerService : ITrainerService
 {
     private readonly ITrainerRepository _trainerRepository;
+    private readonly IPokemonRepository _pokemonRepository;
 
-    public TrainerService(ITrainerRepository trainerRepository)
+    public TrainerService(ITrainerRepository trainerRepository, IPokemonRepository pokemonRepository)
     {
         _trainerRepository = trainerRepository;
+        _pokemonRepository = pokemonRepository;
     }
 
     public async Task CreateTrainerAsync(string name, int age, string cpf)
@@ -20,5 +24,31 @@ public class TrainerService : ITrainerService
         }
 
         await _trainerRepository.CreateTrainerAsync(name, age, cpf);
+    }
+
+    public async Task CapturePokemon(int trainerId, int pokemonId)
+    {
+        var trainer = await _trainerRepository.GetById(trainerId) 
+            ?? throw new InvalidOperationException("Trainer not found");
+
+        var pokemon = await _pokemonRepository.GetById(pokemonId) 
+            ?? throw new InvalidOperationException("Pokemon not found");
+
+        trainer.AddPokemon(pokemon);
+        await _trainerRepository.UpdateTrainerAsync(trainer);
+    }
+
+    public async Task<Trainer?> GetById(int id)
+    {
+        var trainer = await _trainerRepository.GetById(id)
+            ?? throw new InvalidOperationException("Trainer not found");
+
+        return trainer;
+    }
+
+    public async Task<List<Pokemon>> GetCapturedPokemons(int id)
+    {
+        List<Pokemon> pokemons = await _trainerRepository.GetCapturedPokemons(id);
+        return pokemons;
     }
 }

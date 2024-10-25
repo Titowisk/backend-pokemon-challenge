@@ -28,29 +28,32 @@ public class TrainerController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Trainer>> GetById(int id)
     {
-        return Ok();
+        var trainer = await _trainerService.GetById(id);
 
+        return Ok(trainer);
     }
 
     // GetCapturedPokemons: Get all captured pokemons of a trainer
     [HttpGet("{id}/captured-pokemons")]
     public async Task<ActionResult<IEnumerable<Pokemon>>> GetCapturedPokemons(int id)
     {
-
-        return Ok();
-
+        var pokemons = await _trainerService.GetCapturedPokemons(id);
+        return Ok(pokemons);
     }
 
     // CapturePokemon: Capture a pokemon for a trainer
-    [HttpPost("{id}/capture-pokemon")]
-    public async Task<ActionResult> CapturePokemon(int id, [FromBody] Pokemon pokemon)
+    [HttpPost("{id}/pokemon/{pokemonId}")]
+    public async Task<ActionResult> CapturePokemon(int id, int pokemonId)
     {
-
-        return Ok();
-
+        await _trainerService.CapturePokemon(id, pokemonId);
+        return NoContent();
     }
 
-    // Post: Create a new trainer
+    /// <summary>
+    /// Create a new trainer
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
     [HttpPost]
     public async Task<ActionResult<Trainer>> Create([FromBody] CreateTrainerDto dto)
     {
