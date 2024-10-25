@@ -24,6 +24,7 @@ public static class DependencyInjection
     public static IServiceCollection AddRepository(this IServiceCollection services)
     {
         services.AddScoped<IPokemonRepository, PokemonRepository>();
+        services.AddScoped<ITrainerRepository, TrainerRepository>();
         return services;
     }
 }
