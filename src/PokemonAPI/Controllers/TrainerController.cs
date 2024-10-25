@@ -17,32 +17,22 @@ public class TrainerController : ControllerBase
         _trainerService = trainerService;
     }
 
-    // Get: Get all trainers
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Trainer>>> Get()
-    {
-        return Ok();
-    }
-
-    // GetById: Get a trainer by id
     [HttpGet("{id}")]
-    public async Task<ActionResult<Trainer>> GetById(int id)
+    public async Task<ActionResult<TrainerDto>> GetById(int id)
     {
         var trainer = await _trainerService.GetById(id);
 
         return Ok(trainer);
     }
 
-    // GetCapturedPokemons: Get all captured pokemons of a trainer
     [HttpGet("{id}/captured-pokemons")]
-    public async Task<ActionResult<IEnumerable<PokemonDto>>> GetCapturedPokemons(int id)
+    public async Task<ActionResult<IEnumerable<CapturedPokemonDto>>> GetCapturedPokemons(int id)
     {
         var pokemons = await _trainerService.GetCapturedPokemons(id);
         return Ok(pokemons);
     }
 
-    // CapturePokemon: Capture a pokemon for a trainer
-    [HttpPost("{id}/pokemon/{pokemonId}")]
+    [HttpPost("{id}/capture-pokemon/{pokemonId}")]
     public async Task<ActionResult> CapturePokemon(int id, int pokemonId)
     {
         await _trainerService.CapturePokemon(id, pokemonId);

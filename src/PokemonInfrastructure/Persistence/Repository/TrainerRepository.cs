@@ -43,6 +43,7 @@ public class TrainerRepository : ITrainerRepository
     {
         var trainer = await _context.Trainers
                         .Include(t => t.Pokemons)
+                            .ThenInclude(p => p.Types)
                         .FirstOrDefaultAsync(t => t.Id == id);
 
         return trainer?.Pokemons ?? [];
