@@ -25,10 +25,24 @@ namespace PokemonInfrastructure.Persistence.Seed
 
         public async Task SeedTypeTableAsync()
         {
+            if (_context.Types.Any())
+            {
+                return;
+            }
+
             var response = await _httpClient.GetStringAsync("https://pokeapi.co/api/v2/type");
             var typeList = JsonSerializer.Deserialize<TypeListReference>(response);
 
-            // Code to seed the Type table using typeList
+            if (typeList != null)
+            {
+                foreach (var type in typeList.Results)
+                {
+                    var newType = PokemonDomain.TypeModel.Type.Create(type.Name);
+                    _context.Types.Add(newType);
+                }
+
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task SeedPokemonTableAsync()
@@ -55,6 +69,8 @@ namespace PokemonInfrastructure.Persistence.Seed
                         pokemonReference.Sprites.FrontDefault
                     );
 
+                    SetPokemonType(pokemon, pokemonReference.Types);
+
                     _context.Pokemons.Add(pokemon);
                    
                     await _context.SaveChangesAsync();
@@ -62,6 +78,21 @@ namespace PokemonInfrastructure.Persistence.Seed
             }
 
             await SeedPokemonEvolutionTableAsync();
+        }
+
+        private void SetPokemonType(Pokemon pokemon, List<TypeSlot> types)
+        {
+            foreach (var item in types)
+            {
+                PokemonDomain.TypeModel.Type? databaseType = _context
+                    .Types
+                    .FirstOrDefault(t => t.Name == item.Type.Name);
+
+                if (databaseType is not null)
+                {
+                    pokemon.Types.Add(databaseType);
+                }
+            }
         }
 
         /// <summary>
@@ -223,12 +254,15 @@ namespace PokemonInfrastructure.Persistence.Seed
     #region Pokemon Type
     public class TypeListReference
     {
+        [JsonPropertyName("results")]
         public List<Type> Results { get; set; }
     }
 
     public class Type
     {
+        [JsonPropertyName("name")]
         public string Name { get; set; }
+        [JsonPropertyName("url")]
         public string Url { get; set; }
     }
     #endregion
