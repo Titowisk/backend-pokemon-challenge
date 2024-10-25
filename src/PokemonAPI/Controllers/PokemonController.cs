@@ -23,7 +23,12 @@ public class PokemonController : ControllerBase
     }
 
     // GetById: Get a pokemon by id
-
+    [HttpGet("{id}")]
+    public async Task<ActionResult<string>> GetPokemonById(int id)
+    {
+        var pokemon = await _pokemonService.GetById(id);
+        return Ok(pokemon);
+    }
 
     // GetCapturedPokemons: Get all captured pokemons
 

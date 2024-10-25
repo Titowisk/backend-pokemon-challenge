@@ -22,4 +22,12 @@ public class PokemonService : IPokemonService
 
         return randomPokemons;
     }
+
+    public async Task<Pokemon> GetById(int id)
+    {
+        var pokemon = await _pokemonRepository.GetById(id);
+
+        return pokemon == null ? 
+            throw new NullReferenceException($"Pokemon with id {id} not found") : pokemon;
+    }
 }
