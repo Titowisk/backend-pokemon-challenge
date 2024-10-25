@@ -14,13 +14,18 @@ public class PokemonRepository : IPokemonRepository
 
     public async Task<List<Pokemon>> GetAll()
     {
-        return await _context.Pokemons.ToListAsync();
+        return await _context.Pokemons
+            .Include(x => x.Types)
+            .Include(x => x.Evolutions)
+            .Include(x => x.Involutions)
+            .ToListAsync();
     }
 
     public async Task<Pokemon?> GetById(int id)
     {
         return await _context
             .Pokemons
+                .Include(x => x.Types)
                 .Include(x => x.Evolutions)
                 .Include(x => x.Involutions)
             .FirstOrDefaultAsync(x => x.Id == id);

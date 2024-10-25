@@ -1,10 +1,10 @@
-﻿using PokemonDomain.PokemonModel;
+﻿using PokemonContracts.DTOs;
 
 namespace PokemonApplication.PokemonService
 {
     public interface IPokemonService
     {
-        Task<Pokemon> GetById(int id);
-        Task<List<Pokemon>> GetRandomPokemonsAsync(int quantity);
+        Task<PokemonDto> GetById(int id);
+        Task<List<PokemonDto>> GetRandomPokemonsAsync(int quantity);
     }
 }

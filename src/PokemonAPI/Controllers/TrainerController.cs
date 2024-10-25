@@ -35,7 +35,7 @@ public class TrainerController : ControllerBase
 
     // GetCapturedPokemons: Get all captured pokemons of a trainer
     [HttpGet("{id}/captured-pokemons")]
-    public async Task<ActionResult<IEnumerable<Pokemon>>> GetCapturedPokemons(int id)
+    public async Task<ActionResult<IEnumerable<PokemonDto>>> GetCapturedPokemons(int id)
     {
         var pokemons = await _trainerService.GetCapturedPokemons(id);
         return Ok(pokemons);

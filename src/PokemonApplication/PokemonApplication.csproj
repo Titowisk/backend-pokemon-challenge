@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PokemonContracts\PokemonContracts.csproj" />
     <ProjectReference Include="..\PokemonDomain\PokemonDomain.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,5 @@
 ﻿using PokemonApplication.Persistence;
+using PokemonContracts.DTOs;
 using PokemonDomain.PokemonModel;
 using PokemonDomain.TrainerModel;
 
@@ -46,9 +47,19 @@ public class TrainerService : ITrainerService
         return trainer;
     }
 
-    public async Task<List<Pokemon>> GetCapturedPokemons(int id)
+    public async Task<List<PokemonDto>> GetCapturedPokemons(int id)
     {
         List<Pokemon> pokemons = await _trainerRepository.GetCapturedPokemons(id);
-        return pokemons;
+
+        var pokemonDtos = pokemons.Select(p => new PokemonDto
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Evolutions = p.Evolutions.Select(e => e.Name).ToList(),
+            Involutions = p.Involutions.Select(i => i.Name).ToList(),
+            Types = p.Types.Select(t => t.Name).ToList()
+        }).ToList();
+
+        return pokemonDtos;
     }
 }
