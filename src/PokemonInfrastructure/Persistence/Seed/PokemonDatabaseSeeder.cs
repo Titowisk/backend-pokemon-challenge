@@ -1,4 +1,5 @@
-﻿using PokemonDomain.PokemonModel;
+﻿using Microsoft.EntityFrameworkCore;
+using PokemonDomain.PokemonModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -20,7 +21,6 @@ namespace PokemonInfrastructure.Persistence.Seed
             _context.Database.EnsureCreated();
             await SeedTypeTableAsync();
             await SeedPokemonTableAsync();
-            await SeedPokemonEvolutionTableAsync();
         }
 
         public async Task SeedTypeTableAsync()
@@ -60,6 +60,8 @@ namespace PokemonInfrastructure.Persistence.Seed
                     await _context.SaveChangesAsync();
                 }
             }
+
+            await SeedPokemonEvolutionTableAsync();
         }
 
         /// <summary>
@@ -68,7 +70,10 @@ namespace PokemonInfrastructure.Persistence.Seed
         /// <returns></returns>
         public async Task SeedPokemonEvolutionTableAsync()
         {
-            List<Pokemon> allPokemons = _context.Pokemons.ToList();
+            List<Pokemon> allPokemons = _context.Pokemons
+                .Include(x => x.Evolutions)
+                .Include(x => x.Involutions)
+                .ToList();
 
             foreach (var pokemon in allPokemons)
             {
@@ -101,6 +106,7 @@ namespace PokemonInfrastructure.Persistence.Seed
 
                     pokemon.Evolutions.Add(evolution);
                     evolution.Involutions.Add(pokemon);
+
 
                     await _context.SaveChangesAsync();
                 }
