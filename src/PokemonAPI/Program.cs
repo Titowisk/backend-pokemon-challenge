@@ -6,18 +6,20 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
+        // Many-to-many relationships in EF Core can cause cycles in the serialization
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Hide exception information from client. A btter approach would be to use ErrorOr lib from Amichai Mantinband
+builder.Services.AddProblemDetails();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Options Pattern
+// Options Pattern implementation
 builder.Services.Configure<DatabaseSettings>(
     builder.Configuration.GetSection(DatabaseSettings.DatabaseSettingsKey));
 builder.Services.Configure<SeedOptions>(
@@ -31,13 +33,12 @@ builder.Services
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 
-    // Seed the database
+    // Seed the database with pokemons and other information from pokeapi
     using (var scope = app.Services.CreateScope())
     {
         var services = scope.ServiceProvider;
@@ -45,6 +46,8 @@ if (app.Environment.IsDevelopment())
         await seeder.SeedTable();
     }
 }
+
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 

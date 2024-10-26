@@ -7,6 +7,9 @@ using System.Text.Json.Serialization;
 
 namespace PokemonInfrastructure.Persistence.Seed
 {
+    /// <summary>
+    /// Decide to do this seeder to save time populating the database with pokemons and types
+    /// </summary>
     public class PokemonDatabaseSeeder
     {
         private readonly HttpClient _httpClient;
@@ -22,6 +25,7 @@ namespace PokemonInfrastructure.Persistence.Seed
 
         public async Task SeedTable()
         {
+            // create the database if it doesn't exist and apply migrations
             _context.Database.EnsureCreated();
             await SeedTypeTableAsync();
             await SeedPokemonTableAsync();
@@ -171,6 +175,8 @@ namespace PokemonInfrastructure.Persistence.Seed
             return null;
         }
     }
+
+    // dumb objects to deserialize the json response from requests
 
     #region Pokemon Reference
     public class PokemonReference
