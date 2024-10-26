@@ -1,5 +1,5 @@
 # PokemonAPI
-Uma API para serviçoes relacionados a pokemons e treinadores
+Uma API para serviços relacionados a pokemons e treinadores
 
 # Tecnologias
 - NET 8 / C#
