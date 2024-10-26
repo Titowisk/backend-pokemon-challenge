@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using PokemonContracts.Options;
 using PokemonDomain.PokemonModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -9,11 +11,13 @@ namespace PokemonInfrastructure.Persistence.Seed
     {
         private readonly HttpClient _httpClient;
         private readonly PokemonContext _context;
+        private readonly SeedOptions _seedOptions;
 
-        public PokemonDatabaseSeeder(HttpClient httpClient, PokemonContext context)
+        public PokemonDatabaseSeeder(HttpClient httpClient, PokemonContext context, IOptions<SeedOptions> seedOptions)
         {
             _httpClient = httpClient;
             _context = context;
+            _seedOptions = seedOptions.Value;
         }
 
         public async Task SeedTable()
@@ -52,7 +56,7 @@ namespace PokemonInfrastructure.Persistence.Seed
                 return;
             }
 
-            int howManyPokemons = 9;
+            int howManyPokemons = _seedOptions.PokemonQuantity;
             for (int pokeIndex = 1; pokeIndex <= howManyPokemons; pokeIndex++)
             {
                 Task.Delay(200).Wait(); // Delay to avoid rate limiting

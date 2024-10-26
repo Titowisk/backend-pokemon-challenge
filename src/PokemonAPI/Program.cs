@@ -17,8 +17,11 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Options Pattern
 builder.Services.Configure<DatabaseSettings>(
     builder.Configuration.GetSection(DatabaseSettings.DatabaseSettingsKey));
+builder.Services.Configure<SeedOptions>(
+    builder.Configuration.GetSection(SeedOptions.Key));
 
 builder.Services.AddHttpClient();
 
